@@ -5,6 +5,7 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.time.Duration;
+import java.util.List;
 
 public class AmazonResultsPage extends BasePage {
 
@@ -16,15 +17,25 @@ public class AmazonResultsPage extends BasePage {
 	}
 
 	public AmazonResultsPage ensureLoaded() {
+		waitForDocumentReady();
 		wait.until(ExpectedConditions.visibilityOfElementLocated(RESULTS_CONTAINER));
 		return this;
 	}
 
 	public void openFirstResult() {
 		wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(RESULT_LINKS, 0));
-		WebElement first = driver.findElements(RESULT_LINKS).get(0);
+		List<WebElement> links = driver.findElements(RESULT_LINKS);
+		WebElement first = links.get(0);
 		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", first);
-		wait.until(ExpectedConditions.elementToBeClickable(first)).click();
+		try {
+			wait.until(ExpectedConditions.elementToBeClickable(first)).click();
+		} catch (ElementClickInterceptedException | TimeoutException e) {
+			((JavascriptExecutor) driver).executeScript("arguments[0].click();", first);
+		}
+	}
+
+	public void openFirstIphone17Result() {
+		openFirstResult();
 	}
 }
 
