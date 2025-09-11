@@ -14,7 +14,9 @@ public class ExampleHomePage extends BasePage {
 	}
 
 	public ExampleHomePage ensureLoaded() {
+		wait.until(ExpectedConditions.titleContains("Example"));
 		wait.until(ExpectedConditions.visibilityOfElementLocated(HEADING));
+		wait.until(ExpectedConditions.presenceOfElementLocated(MORE_INFO_LINK));
 		return this;
 	}
 
