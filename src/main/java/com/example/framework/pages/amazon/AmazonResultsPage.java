@@ -4,9 +4,11 @@ import com.example.framework.pages.BasePage;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.interactions.Actions;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Set;
 
 public class AmazonResultsPage extends BasePage {
 
@@ -54,21 +56,38 @@ public class AmazonResultsPage extends BasePage {
 		try {
 			href = link.getAttribute("href");
 		} catch (StaleElementReferenceException ignored) {}
+
+		Set<String> beforeHandles = driver.getWindowHandles();
+		boolean clicked = false;
 		try {
 			wait.until(ExpectedConditions.elementToBeClickable(link)).click();
+			clicked = true;
 		} catch (ElementClickInterceptedException | TimeoutException e1) {
 			try {
-				((JavascriptExecutor) driver).executeScript("arguments[0].click();", link);
+				new Actions(driver).moveToElement(link).pause(java.time.Duration.ofMillis(120)).click().perform();
+				clicked = true;
 			} catch (Exception e2) {
 				try {
-					link.sendKeys(Keys.ENTER);
+					((JavascriptExecutor) driver).executeScript("arguments[0].click();", link);
+					clicked = true;
 				} catch (Exception e3) {
-					// Final fallback: direct navigation
-					if (href != null && !href.isBlank()) {
-						driver.navigate().to(href);
-					}
+					try {
+						link.sendKeys(Keys.ENTER);
+						clicked = true;
+					} catch (Exception ignored2) {}
 				}
 			}
+		}
+
+		if (!clicked && href != null && !href.isBlank()) {
+			driver.navigate().to(href);
+		}
+
+		// Switch to new tab/window if opened
+		Set<String> afterHandles = driver.getWindowHandles();
+		if (afterHandles.size() > beforeHandles.size()) {
+			afterHandles.removeAll(beforeHandles);
+			driver.switchTo().window(afterHandles.iterator().next());
 		}
 
 		// Wait for navigation to product or sign-in page
