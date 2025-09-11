@@ -2,9 +2,7 @@
 <suite name="Selenium Suite" verbose="1" parallel="none">
   <test name="Sample Tests">
     <classes>
-      <class name="com.example.framework.tests.SampleTest"/>
-      <class name="com.example.framework.tests.ExampleHomePageTest"/>
-      <class name="com.example.framework.tests.AmazonNotifyMeTest"/>
+      <class name="com.example.framework.tests.AmazonSearchVisibilityTest"/>
     </classes>
   </test>
 </suite>

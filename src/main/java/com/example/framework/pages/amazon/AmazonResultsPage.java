@@ -99,6 +99,30 @@ public class AmazonResultsPage extends BasePage {
 		});
 	}
 
+	public boolean isFirstResultVisible() {
+		try {
+			waitForDocumentReady();
+			wait.until(ExpectedConditions.or(
+				ExpectedConditions.visibilityOfElementLocated(RESULTS_CONTAINER),
+				ExpectedConditions.presenceOfElementLocated(FIRST_RESULT_CONTAINER_XPATH)
+			));
+			if (!driver.findElements(FIRST_RESULT_CONTAINER_XPATH).isEmpty()) {
+				WebElement container = driver.findElement(FIRST_RESULT_CONTAINER_XPATH);
+				((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", container);
+				return container.isDisplayed();
+			}
+			List<WebElement> links = driver.findElements(RESULT_LINKS);
+			if (!links.isEmpty()) {
+				WebElement first = links.get(0);
+				((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", first);
+				return first.isDisplayed();
+			}
+			return false;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
 	public void openFirstIphone17Result() {
 		openFirstResult();
 	}
