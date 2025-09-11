@@ -4,6 +4,7 @@
     <classes>
       <class name="com.example.framework.tests.SampleTest"/>
       <class name="com.example.framework.tests.ExampleHomePageTest"/>
+      <class name="com.example.framework.tests.AmazonNotifyMeTest"/>
     </classes>
   </test>
 </suite>
