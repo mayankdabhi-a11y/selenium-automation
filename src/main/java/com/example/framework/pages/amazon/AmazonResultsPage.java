@@ -3,6 +3,7 @@ package com.example.framework.pages.amazon;
 import com.example.framework.pages.BasePage;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 import java.util.List;
@@ -27,36 +28,56 @@ public class AmazonResultsPage extends BasePage {
 	}
 
 	public void openFirstResult() {
-		// Try user-provided XPath container first
+		// Resolve a reliable first link element
+		WebElement link = null;
 		try {
-			wait.until(ExpectedConditions.presenceOfElementLocated(FIRST_RESULT_CONTAINER_XPATH));
-			WebElement container = driver.findElement(FIRST_RESULT_CONTAINER_XPATH);
-			WebElement link;
+			// Prefer a direct <a> in the first result item if available
+			link = new WebDriverWait(driver, Duration.ofSeconds(20))
+				.until(ExpectedConditions.presenceOfElementLocated(By.xpath("(//div[@data-component-type='s-search-result']//h2//a[contains(@href,'/dp/') or contains(@href,'/gp/')])[1]")));
+		} catch (TimeoutException e) {
 			try {
+				// Use provided container xpath, then find its h2/a
+				wait.until(ExpectedConditions.presenceOfElementLocated(FIRST_RESULT_CONTAINER_XPATH));
+				WebElement container = driver.findElement(FIRST_RESULT_CONTAINER_XPATH);
 				link = container.findElement(By.cssSelector("h2 a"));
-			} catch (NoSuchElementException ignore) {
-				link = container;
+			} catch (Exception ignored) {
+				// Fallback to CSS list of result links
+				wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(RESULT_LINKS, 0));
+				List<WebElement> links = driver.findElements(RESULT_LINKS);
+				link = links.get(0);
 			}
-			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", link);
-			try {
-				wait.until(ExpectedConditions.elementToBeClickable(link)).click();
-			} catch (ElementClickInterceptedException | TimeoutException e) {
-				((JavascriptExecutor) driver).executeScript("arguments[0].click();", link);
-			}
-			return;
-		} catch (TimeoutException ignored) {
-			// Fallback to CSS selector approach
 		}
 
-		wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(RESULT_LINKS, 0));
-		List<WebElement> links = driver.findElements(RESULT_LINKS);
-		WebElement first = links.get(0);
-		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", first);
+		// Scroll into view and attempt click strategies; if all fail, navigate via href
+		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", link);
+		String href = null;
 		try {
-			wait.until(ExpectedConditions.elementToBeClickable(first)).click();
-		} catch (ElementClickInterceptedException | TimeoutException e) {
-			((JavascriptExecutor) driver).executeScript("arguments[0].click();", first);
+			href = link.getAttribute("href");
+		} catch (StaleElementReferenceException ignored) {}
+		try {
+			wait.until(ExpectedConditions.elementToBeClickable(link)).click();
+		} catch (ElementClickInterceptedException | TimeoutException e1) {
+			try {
+				((JavascriptExecutor) driver).executeScript("arguments[0].click();", link);
+			} catch (Exception e2) {
+				try {
+					link.sendKeys(Keys.ENTER);
+				} catch (Exception e3) {
+					// Final fallback: direct navigation
+					if (href != null && !href.isBlank()) {
+						driver.navigate().to(href);
+					}
+				}
+			}
 		}
+
+		// Wait for navigation to product or sign-in page
+		new WebDriverWait(driver, Duration.ofSeconds(20)).until(d -> {
+			String url = d.getCurrentUrl();
+			boolean navigated = url.contains("/dp/") || url.contains("/gp/");
+			boolean signInVisible = !d.findElements(By.id("signInSubmit")).isEmpty() || !d.findElements(By.id("ap_email")).isEmpty();
+			return navigated || signInVisible;
+		});
 	}
 
 	public void openFirstIphone17Result() {
