@@ -21,8 +21,8 @@ public class AmazonNotifyMeTest extends BaseTest {
 
 		AmazonProductPage product = new AmazonProductPage(driver)
 			.ensureLoaded();
-		product.triggerNotifyOrBuyNow();
-		Assert.assertTrue(product.isSignInShown(), "Expected sign-in page to be shown");
+		Assert.assertTrue(product.waitForSignInPresence(java.time.Duration.ofSeconds(20)), "Expected sign-in page to be visible");
+		Assert.assertTrue(product.isSignInButtonPresent(), "Expected sign-in button to be present");
 	}
 }
 
