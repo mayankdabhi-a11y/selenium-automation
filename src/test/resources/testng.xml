@@ -2,7 +2,6 @@
 <suite name="Selenium Suite" verbose="1" parallel="none">
   <test name="Sample Tests">
     <classes>
-      <class name="com.example.framework.tests.SampleTest"/>
       <class name="com.example.framework.tests.FlipkartLoginTest"/>
       <class name="com.example.framework.tests.FlipkartBrandFilterTest"/>
     </classes>
