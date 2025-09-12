@@ -34,7 +34,7 @@ public class FlipkartLoginTest extends BaseTest {
 		}
 
 		// Verify login form appears (or navigate directly if header did not open it)
-		By mobileInput = By.xpath("//input[(contains(translate(@placeholder,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'mobile') or contains(@autocomplete,'username') or @name='login-form-input' or @type='tel' or @type='text')]");
+		By mobileInput = By.xpath("//form//input[not(@name='q') and (contains(translate(@placeholder,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'email') or contains(translate(@placeholder,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'mobile'))]");
 		boolean onLogin = false;
 		try {
 			wait.until(ExpectedConditions.or(
@@ -51,12 +51,13 @@ public class FlipkartLoginTest extends BaseTest {
 
 		// Enter mobile number and request OTP
 		input.clear();
-		input.sendKeys("9998217768");
+		String phone = "99987654323";
+		input.sendKeys(phone);
 		By requestOtp = By.xpath("//button[.//span[contains(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'request otp')] or contains(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'request otp') or contains(.,'CONTINUE') or contains(.,'Continue')]");
 		wait.until(ExpectedConditions.elementToBeClickable(requestOtp)).click();
 
-		// Verify OTP prompt text contains the masked phone number
-		String expectedPhone = "9998217768";
+		// Verify OTP prompt text contains the masked phone number tail
+		String expectedPhone = phone;
 		By otpPrompt = By.xpath("//*[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'please enter the otp')]");
 		WebElement prompt = new WebDriverWait(driver, Duration.ofSeconds(20))
 			.until(ExpectedConditions.visibilityOfElementLocated(otpPrompt));
