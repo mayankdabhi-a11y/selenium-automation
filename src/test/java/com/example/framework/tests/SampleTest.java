@@ -6,6 +6,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.time.Duration;
@@ -34,6 +35,20 @@ public class SampleTest extends BaseTest {
 		// Search for iPhone 17
 		By searchBox = By.name("q");
 		wait.until(ExpectedConditions.visibilityOfElementLocated(searchBox)).sendKeys("iPhone 17", Keys.ENTER);
+
+		// Verify results contain "iphone 17" and click the first matching link
+		By iphone17Links = By.xpath("//a[contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'iphone 17')]");
+		List<WebElement> results = wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(iphone17Links, 0))
+			? driver.findElements(iphone17Links)
+			: List.of();
+		Assert.assertTrue(!results.isEmpty(), "Expected at least one result containing 'iPhone 17'");
+		WebElement firstMatch = results.get(0);
+		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", firstMatch);
+		try {
+			wait.until(ExpectedConditions.elementToBeClickable(firstMatch)).click();
+		} catch (Exception e) {
+			((JavascriptExecutor) driver).executeScript("arguments[0].click();", firstMatch);
+		}
 	}
 }
 
