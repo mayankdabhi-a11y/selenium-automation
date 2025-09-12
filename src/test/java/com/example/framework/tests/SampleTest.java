@@ -11,6 +11,7 @@ import org.testng.annotations.Test;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Set;
 
 public class SampleTest extends BaseTest {
 
@@ -42,11 +43,27 @@ public class SampleTest extends BaseTest {
 		Assert.assertTrue(!results.isEmpty(), "Expected at least one result containing 'iPhone 17'");
 		WebElement firstMatch = results.get(0);
 		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", firstMatch);
+		Set<String> beforeHandles = driver.getWindowHandles();
 		try {
 			wait.until(ExpectedConditions.elementToBeClickable(firstMatch)).click();
 		} catch (Exception e) {
 			((JavascriptExecutor) driver).executeScript("arguments[0].click();", firstMatch);
 		}
+
+		// Switch to new tab/window if it opened, then assert title contains iphone 17
+		try {
+			new WebDriverWait(driver, Duration.ofSeconds(10)).until(d -> d.getWindowHandles().size() > beforeHandles.size());
+			Set<String> afterHandles = driver.getWindowHandles();
+			afterHandles.removeAll(beforeHandles);
+			if (!afterHandles.isEmpty()) {
+				String newHandle = afterHandles.iterator().next();
+				driver.switchTo().window(newHandle);
+			}
+		} catch (Exception ignored) {}
+
+		boolean titleHasIphone17 = new WebDriverWait(driver, Duration.ofSeconds(15))
+			.until(d -> d.getTitle() != null && d.getTitle().toLowerCase().contains("iphone 17"));
+		Assert.assertTrue(titleHasIphone17, "Expected product page title to contain 'iPhone 17'");
 	}
 }
 
