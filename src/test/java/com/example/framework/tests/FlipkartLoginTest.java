@@ -54,6 +54,15 @@ public class FlipkartLoginTest extends BaseTest {
 		input.sendKeys("9998217768");
 		By requestOtp = By.xpath("//button[.//span[contains(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'request otp')] or contains(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'request otp') or contains(.,'CONTINUE') or contains(.,'Continue')]");
 		wait.until(ExpectedConditions.elementToBeClickable(requestOtp)).click();
+
+		// Verify OTP prompt text contains the masked phone number
+		String expectedPhone = "9998217768";
+		By otpPrompt = By.xpath("//*[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'please enter the otp')]");
+		WebElement prompt = new WebDriverWait(driver, Duration.ofSeconds(20))
+			.until(ExpectedConditions.visibilityOfElementLocated(otpPrompt));
+		String promptText = prompt.getText().toLowerCase();
+		Assert.assertTrue(promptText.contains("please enter the otp"), "OTP prompt text not found");
+		Assert.assertTrue(promptText.contains(expectedPhone.substring(expectedPhone.length()-4)), "Phone tail digits not present in OTP prompt");
 	}
 }
 
