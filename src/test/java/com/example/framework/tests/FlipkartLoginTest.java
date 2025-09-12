@@ -34,7 +34,7 @@ public class FlipkartLoginTest extends BaseTest {
 		}
 
 		// Verify login form appears (or navigate directly if header did not open it)
-		By mobileInput = By.xpath("//form//input[not(@name='q') and (contains(translate(@placeholder,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'email') or contains(translate(@placeholder,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'mobile'))]");
+		By mobileInput = By.xpath("//input[contains(@class, 'r4vIwl') and contains(@class, 'BV+Dqf')]");
 		boolean onLogin = false;
 		try {
 			wait.until(ExpectedConditions.or(
