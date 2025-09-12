@@ -10,6 +10,7 @@ import org.testng.annotations.Test;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Set;
 
 public class FlipkartBrandFilterTest extends BaseTest {
 
@@ -42,5 +43,28 @@ public class FlipkartBrandFilterTest extends BaseTest {
 		By results = By.xpath("//a[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'iphone')]");
 		List<WebElement> items = wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(results, 0));
 		Assert.assertTrue(items.size() > 0, "Expected results mentioning iPhone after applying APPLE filter");
+
+		// Click the first iPhone link and verify a new tab opens with title containing 'iphone 17'
+		WebElement first = items.get(0);
+		((org.openqa.selenium.JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", first);
+		Set<String> beforeHandles = driver.getWindowHandles();
+		try {
+			wait.until(ExpectedConditions.elementToBeClickable(first)).click();
+		} catch (Exception e) {
+			((org.openqa.selenium.JavascriptExecutor) driver).executeScript("arguments[0].click();", first);
+		}
+
+		try {
+			new WebDriverWait(driver, Duration.ofSeconds(10)).until(d -> d.getWindowHandles().size() > beforeHandles.size());
+			Set<String> after = driver.getWindowHandles();
+			after.removeAll(beforeHandles);
+			if (!after.isEmpty()) {
+				driver.switchTo().window(after.iterator().next());
+			}
+		} catch (Exception ignored) {}
+
+		boolean titleHasIphone17 = new WebDriverWait(driver, Duration.ofSeconds(15))
+			.until(d -> d.getTitle() != null && d.getTitle().toLowerCase().contains("iphone 17"));
+		Assert.assertTrue(titleHasIphone17, "Expected product page title to contain 'iPhone 17'");
 	}
 }
