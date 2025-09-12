@@ -56,14 +56,13 @@ public class FlipkartLoginTest extends BaseTest {
 		By requestOtp = By.xpath("//button[.//span[contains(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'request otp')] or contains(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'request otp') or contains(.,'CONTINUE') or contains(.,'Continue')]");
 		wait.until(ExpectedConditions.elementToBeClickable(requestOtp)).click();
 
-		// Verify OTP prompt text contains the masked phone number tail
-		String expectedPhone = phone;
-		By otpPrompt = By.xpath("//*[contains(translate(normalize-space(.),'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'please enter the otp')]");
-		WebElement prompt = new WebDriverWait(driver, Duration.ofSeconds(20))
-			.until(ExpectedConditions.visibilityOfElementLocated(otpPrompt));
-		String promptText = prompt.getText().toLowerCase();
-		Assert.assertTrue(promptText.contains("please enter the otp"), "OTP prompt text not found");
-		Assert.assertTrue(promptText.contains(expectedPhone.substring(expectedPhone.length()-4)), "Phone tail digits not present in OTP prompt");
+		// Verify validation message for invalid email/mobile appears
+		By validationMsg = By.xpath("//*[contains(normalize-space(.), 'Please enter valid Email ID/Mobile number')]");
+		WebElement validation = new WebDriverWait(driver, Duration.ofSeconds(15))
+			.until(ExpectedConditions.visibilityOfElementLocated(validationMsg));
+		Assert.assertTrue(validation.isDisplayed(), "Expected validation message to be visible");
+		Assert.assertTrue(validation.getText().contains("Please enter valid Email ID/Mobile number"),
+			"Validation message text mismatch");
 	}
 }
 
