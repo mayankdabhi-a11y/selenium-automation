@@ -4,6 +4,7 @@
     <classes>
       <class name="com.example.framework.tests.SampleTest"/>
       <class name="com.example.framework.tests.FlipkartLoginTest"/>
+      <class name="com.example.framework.tests.FlipkartBrandFilterTest"/>
     </classes>
   </test>
 </suite>
