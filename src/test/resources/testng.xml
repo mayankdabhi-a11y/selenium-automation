@@ -3,6 +3,7 @@
   <test name="Sample Tests">
     <classes>
       <class name="com.example.framework.tests.SampleTest"/>
+      <class name="com.example.framework.tests.FlipkartLoginTest"/>
     </classes>
   </test>
 </suite>
