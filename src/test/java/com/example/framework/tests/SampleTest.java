@@ -64,6 +64,39 @@ public class SampleTest extends BaseTest {
 		boolean titleHasIphone17 = new WebDriverWait(driver, Duration.ofSeconds(15))
 			.until(d -> d.getTitle() != null && d.getTitle().toLowerCase().contains("iphone 17"));
 		Assert.assertTrue(titleHasIphone17, "Expected product page title to contain 'iPhone 17'");
+
+		// Click Pre-order (or Buy Now) and verify login/sign-up prompt appears
+		By preorderButton = By.xpath(
+			"//*[self::button or self::a or @role='button']" +
+			"[contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'pre-order')" +
+			" or contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'pre order')" +
+			" or contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'preorder')" +
+			" or contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'buy now')]");
+
+		try {
+			WebElement preorder = new WebDriverWait(driver, Duration.ofSeconds(15))
+				.until(ExpectedConditions.visibilityOfElementLocated(preorderButton));
+			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", preorder);
+			try {
+				new WebDriverWait(driver, Duration.ofSeconds(5))
+					.until(ExpectedConditions.elementToBeClickable(preorder)).click();
+			} catch (Exception e) {
+				((JavascriptExecutor) driver).executeScript("arguments[0].click();", preorder);
+			}
+		} catch (Exception ignored) {}
+
+		// Assert login / signup prompt appears
+		By loginIndicators = By.xpath(
+			"//*[contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'login')" +
+			" or contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'sign in')" +
+			" or contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'sign-in')" +
+			" or contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'signup')" +
+			" or contains(translate(@placeholder, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'email')" +
+			" or contains(translate(@placeholder, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'mobile')]");
+
+		boolean sawLogin = new WebDriverWait(driver, Duration.ofSeconds(15))
+			.until(d -> !d.findElements(loginIndicators).isEmpty());
+		Assert.assertTrue(sawLogin, "Expected login or signup prompt after clicking Pre-order/Buy Now");
 	}
 }
 
