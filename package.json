@@ -1,0 +1,30 @@
+{
+  "name": "selenium-automation",
+  "version": "1.0.0",
+  "description": "## Prereqs - Java 17+ - Maven 3.9+ - Browsers: Chrome, Firefox, Edge, Safari (macOS)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "cy:open": "cypress open",
+    "cy:run": "cypress run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mayankdabhi-a11y/selenium-automation.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mayankdabhi-a11y/selenium-automation/issues"
+  },
+  "homepage": "https://github.com/mayankdabhi-a11y/selenium-automation#readme",
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^24.3.1",
+    "cypress": "^15.2.0",
+    "cypress-xpath": "^2.0.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  }
+}
