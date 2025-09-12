@@ -38,9 +38,7 @@ public class SampleTest extends BaseTest {
 
 		// Verify results contain "iphone 17" and click the first matching link
 		By iphone17Links = By.xpath("//a[contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'iphone 17')]");
-		List<WebElement> results = wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(iphone17Links, 0))
-			? driver.findElements(iphone17Links)
-			: List.of();
+		List<WebElement> results = wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(iphone17Links, 0));
 		Assert.assertTrue(!results.isEmpty(), "Expected at least one result containing 'iPhone 17'");
 		WebElement firstMatch = results.get(0);
 		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", firstMatch);
